@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Coffee Order</title>
+    <style>
+        body {
+            background-color: #f5f0e6;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            color: #3e2723;
+        }
+
+        h1 {
+            text-align: center;
+            color: palevioletred;
+        }
+
+        h2 {
+            color: palevioletred;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .button-grid button {
+            background-color: #6f4e37;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .button-grid button:hover {
+            background-color: #8b5e3c;
+        }
+
+        input {
+            padding: 8px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 80%;
+        }
+
+        th, td {
+            border: 1px solid #6f4e37;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #6f4e37;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f0e6dc;
+        }
+    </style>
+</head>
+<body>
+<h1>Ctrl + Al-latte</h1>
+
+<h2>Enter Your Name:</h2>
+<input type="text" id="customerName" placeholder="Your name">
+
+<h2>Order Your Coffee</h2>
+<div class="button-grid">
+    <button onclick="orderCoffee('Espresso')">Espresso</button>
+    <button onclick="orderCoffee('Capuccino')">Capuccino</button>
+    <button onclick="orderCoffee('Matcha')">Matcha</button>
+    <button onclick="orderCoffee('Latte')">Latte</button>
+    <button onclick="orderCoffee('Iced Americano')">Iced Americano</button>
+    <button onclick="orderCoffee('Frappe')">Frappe</button>
+    <button onclick="orderCoffee('Dalgona coffee')">Dalgona coffee</button>
+    <button onclick="orderCoffee('Irish Coffee')">Irish Coffee</button>
+    <button onclick="orderCoffee('Mocha')">Mocha</button>
+    <button onclick="orderCoffee('Macchiato')">Macchiato</button>
+</div>
+
+<h2>Your Orders:</h2>
+<table id="ordersTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Coffee</th>
+    </tr>
+    </thead>
+    <tbody id="ordersBody"></tbody>
+</table>
+
+<script>
+    function orderCoffee(type) {
+        const name = document.getElementById("customerName").value;
+        if (!name) {
+            alert("Please enter your name first!");
+            return;
+        }
+
+        fetch("http://localhost:9090/coffee", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: name, type: type })
+        })
+            .then(response => response.json())
+            .then(order => {
+                loadOrders();
+            });
+    }
+
+    function loadOrders() {
+        fetch("http://localhost:9090/coffee")
+            .then(response => response.json())
+            .then(data => {
+                const ordersBody = document.getElementById("ordersBody");
+                ordersBody.innerHTML = '';
+                data.forEach(order => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                            <td>${order.id}</td>
+                            <td>${order.name}</td>
+                            <td>${order.type}</td>
+                        `;
+                    ordersBody.appendChild(row);
+                });
+            });
+    }
+
+    window.onload = loadOrders;
+</script>
+</body>
+</html>
